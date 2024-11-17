@@ -21,7 +21,7 @@ class Record:
             if phone.value == value:
                 self.phones.remove(phone)
                 return
-        raise ItemNotFoundError(value)
+        raise ItemNotFoundError(item=value)
 
     def find_phone(self, value: str) -> Optional[Phone]:
         matching_phones = [

@@ -29,8 +29,8 @@ class BirthdayValidationError(Exception):
 
 
 class ItemNotFoundError(Exception):
-    def __init__(self, item: str = "") -> None:
-        self.message = f"{ErrorMessageEnum.ITEM_NOT_FOUND.value}: {item}"
+    def __init__(self, message: str = ErrorMessageEnum.ITEM_NOT_FOUND.value, item: str = "") -> None:
+        self.message = f"{message}: {item}"
         super().__init__(self.message)
 
 

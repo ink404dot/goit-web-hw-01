@@ -50,7 +50,7 @@ class AddressBook(UserDict):
         if name in self.data:
             del self.data[name]
         else:
-            raise ItemNotFoundError(name)
+            raise ItemNotFoundError(item=name)
 
     def save_data(self, filename="addressbook.pkl"):
         with open(filename, "wb") as f:

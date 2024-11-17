@@ -4,7 +4,7 @@ from enum import Enum
 
 from addressbook import AddressBook
 from record import Record
-from errors import InputErrorHandler
+from errors import InputErrorHandler, ErrorMessageEnum
 
 
 
@@ -160,7 +160,7 @@ class InvokerInterface(ABC):
         pass
 
 
-class Invoker:
+class Invoker(InvokerInterface):
     def __init__(self, book: AddressBook, command: EnumCommandsType, args: List[str]):
         self.command = command
         self.args = args
@@ -170,4 +170,4 @@ class Invoker:
         command_class = command_map.get(self.command)
         if command_class:
             return command_class(self.book, self.args).execute()
-        return "Invalid command."
+        return ErrorMessageEnum.INVALID_COMMAND.value
