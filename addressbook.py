@@ -52,9 +52,9 @@ class AddressBook(UserDict):
         else:
             raise ItemNotFoundError(name)
 
-    def save_data(book, filename="addressbook.pkl"):
+    def save_data(self, filename="addressbook.pkl"):
         with open(filename, "wb") as f:
-            pickle.dump(book, f)
+            pickle.dump(self, f)
 
     @classmethod
     def load_data(cls, filename="addressbook.pkl"):

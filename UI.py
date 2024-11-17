@@ -25,5 +25,8 @@ class CLI_UI:
         while True:
             user_input = input("Enter a command: ")
             command, args = parse_input(user_input)
-            invoker = Invoker(command, args, self.book)
-            invoker.execute_command()
+            invoker = Invoker(self.book, command, args)
+            print(invoker.execute_command())
+            if command.lower() in ("close", "exit"):
+                break
+

@@ -47,13 +47,13 @@ class Phone(Field):
 
 class Birthday(Field):
     def __init__(self, value: str):
-        if self.str_to_datetime(value):
+        if self.validate(value):
             super().__init__(value)
         else:
             raise BirthdayValidationError()
 
     @staticmethod
-    def str_to_datetime(value: str) -> bool:
+    def validate(value: str) -> bool:
         try:
             datetime.strptime(value, "%d.%m.%Y")
             return True

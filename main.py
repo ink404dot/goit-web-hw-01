@@ -2,8 +2,8 @@ from UI import CLI_UI
 
 
 def main():
-    CLI_UI()
-
+    cli_ui = CLI_UI()
+    cli_ui.run()
 
 # Приклад використання
 if __name__ == "__main__":

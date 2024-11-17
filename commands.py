@@ -7,17 +7,38 @@ from record import Record
 from errors import InputErrorHandler
 
 
+
 class Command(ABC):
     def __init__(self, book: AddressBook, args: List[str] = []):
         self.args = args
         self.book = book
-
     @abstractmethod
+    @InputErrorHandler.handle_error
     def execute(self) -> str:
         pass
 
+class CloseCommand(Command):
+    @InputErrorHandler.handle_error
+    def execute(self) -> str:
+        self.book.save_data()
+        return "Closing the program..."
+
+
+class ExitCommand(Command):
+    @InputErrorHandler.handle_error
+    def execute(self) -> str:
+        self.book.save_data()
+        return "Good bye!"
+
+
+class HelloCommand(Command):
+    @InputErrorHandler.handle_error
+    def execute(self) -> str:
+        return "How can I help you?"
+
 
 class AddContactCommand(Command):
+    @InputErrorHandler.handle_error
     def execute(self) -> str:
         name, phone = self.args[0], self.args[1]
         record = self.book.find(name)
@@ -32,6 +53,7 @@ class AddContactCommand(Command):
 
 
 class ChangeContactCommand(Command):
+    @InputErrorHandler.handle_error
     def execute(self) -> str:
         name = self.args[0]
         old_phone, new_phone, *_ = self.args[1], self.args[2]
@@ -45,6 +67,7 @@ class ChangeContactCommand(Command):
 
 
 class AddBirthdayCommand(Command):
+    @InputErrorHandler.handle_error
     def execute(self) -> str:
         name, birthday = self.args[0], self.args[1]
         record = self.book.find(name)
@@ -55,6 +78,7 @@ class AddBirthdayCommand(Command):
 
 
 class ShowBirthdayCommand(Command):
+    @InputErrorHandler.handle_error
     def execute(self) -> str:
         name = self.args[0]
         record = self.book.find(name)
@@ -64,6 +88,7 @@ class ShowBirthdayCommand(Command):
 
 
 class ShowPhoneCommand(Command):
+    @InputErrorHandler.handle_error
     def execute(self) -> str:
         name = self.args[0]
         record = self.book.find(name)
@@ -75,6 +100,7 @@ class ShowPhoneCommand(Command):
 
 
 class ShowAllCommand(Command):
+    @InputErrorHandler.handle_error
     def execute(self):
         if not self.book:
             return "No contacts."
@@ -92,6 +118,7 @@ class ShowAllCommand(Command):
 
 
 class BirthdaysCommand(Command):
+    @InputErrorHandler.handle_error
     def execute(self):
         upcoming_birthdays = self.book.get_upcoming_birthdays()
         if isinstance(upcoming_birthdays, str):  # If there's a message instead of a list
@@ -114,41 +141,33 @@ class EnumCommandsType(str, Enum):
 
 
 command_map = {
-    EnumCommandsType.ADD: AddContactCommand(),
-    EnumCommandsType.CHANGE: ChangeContactCommand(),
-    EnumCommandsType.PHONE: ShowPhoneCommand(),
-    EnumCommandsType.ALL: ShowAllCommand(),
-    EnumCommandsType.BIRTHDAYS: BirthdaysCommand(),
-    EnumCommandsType.ADD_BIRTHDAY: AddBirthdayCommand(),
-    EnumCommandsType.SHOW_BIRTHDAY: ShowBirthdayCommand(),
-    EnumCommandsType.EXIT: "Good bye!",
-    EnumCommandsType.CLOSE: "Closing the program...",
-    EnumCommandsType.HELLO: "How can I help you?",
+    EnumCommandsType.ADD: AddContactCommand,
+    EnumCommandsType.CHANGE: ChangeContactCommand,
+    EnumCommandsType.PHONE: ShowPhoneCommand,
+    EnumCommandsType.ALL: ShowAllCommand,
+    EnumCommandsType.BIRTHDAYS: BirthdaysCommand,
+    EnumCommandsType.ADD_BIRTHDAY: AddBirthdayCommand,
+    EnumCommandsType.SHOW_BIRTHDAY: ShowBirthdayCommand,
+    EnumCommandsType.EXIT: ExitCommand,
+    EnumCommandsType.CLOSE: CloseCommand,
+    EnumCommandsType.HELLO: HelloCommand,
 }
+
 
 class InvokerInterface(ABC):
     @abstractmethod
-    def __init__(self, command: EnumCommandsType, args: List[str], book):
-        self.command = command
-        self.args = args
-        self.book = book
-    @abstractmethod
-    def execute_command(self, command_map: Dict[EnumCommandsType, Command]=command_map):
+    def execute_command(self, command_map: Dict[EnumCommandsType, Command] = command_map):
         pass
 
 
 class Invoker:
-    def __init__(self, command: EnumCommandsType, args: List[str], book):
+    def __init__(self, book: AddressBook, command: EnumCommandsType, args: List[str]):
         self.command = command
         self.args = args
         self.book = book
 
-    @InputErrorHandler.handle_error
     def execute_command(self, command_map=command_map):
         command_class = command_map.get(self.command)
         if command_class:
-            if isinstance(command_class, str):
-                return command_class
-            return command_class.execute(self.args, self.book)
-        else:
-            return "Invalid command."
+            return command_class(self.book, self.args).execute()
+        return "Invalid command."
